@@ -1,29 +1,29 @@
-# Docker
-# Build a Docker image
-# https://docs.microsoft.com/azure/devops/pipelines/languages/docker
+name: Build and Push Docker Image
 
-trigger:
-- main
+on:
+  push:
+    branches:
+      - main  # Change this to the default branch of your repository
 
-resources:
-- repo: self
+jobs:
+  build:
+    runs-on: ubuntu-latest
 
-variables:
-  tag: '$(Build.BuildId)'
-
-stages:
-- stage: Build
-  displayName: Build image
-  jobs:
-  - job: Build
-    displayName: Build 
-    pool:
-      vmImage: 'ubuntu-latest'
     steps:
-    - task: Docker@2
-      displayName: 'Build and Push'
-      inputs:
-        command: 'buildAndPush'
-        username: ${{secrets.DOCKER_USERNAME}}
-        password: ${{secrets.DOCKER_PASSWORD}}
-        repository: shivisharma02/shivi-wp
+    - name: Checkout code
+      uses: actions/checkout@v2
+
+    - name: Login to Docker Hub
+      run: echo ${{ secrets.DOCKERHUB_TOKEN }} | docker login -u ${{ secrets.DOCKERHUB_USERNAME }} --password-stdin
+      env:
+        DOCKER_CLI_AK_ENV: 1  # This is used to enable Docker credential helper
+
+    - name: Build Docker image
+      run: docker build -t your-docker-username/wordpress-app:latest .
+      working-directory: .
+
+    - name: Push Docker image to Docker Hub
+      run: docker push your-docker-username/shvi-wp:latest
+
+    - name: Clean up
+      run: docker logout
