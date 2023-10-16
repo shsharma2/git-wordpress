@@ -1,0 +1,33 @@
+trigger:
+- main
+
+pool:
+  vmImage: 'ubuntu-latest'
+
+variables:
+  dockerRegistryServiceConnection: 'Azure WordPress'
+  imageName: 'shivisharma02/shivi-blog-wordpress'
+
+steps:
+- task: CopyFilesOverSSH@0
+  inputs:
+    sshEndpoint: 'Kestone_connection'
+    contents: 'docker-compose.yml'
+    targetFolder: '/home/shivi/wordpress'
+    readyTimeout: '20000'
+
+- task: Docker@2
+  inputs:
+    containerRegistry: 'Azure WordPress'
+    repository: 'shivisharma02/shivi-blog-wordpress'
+    command: 'buildAndPush'
+    Dockerfile: 'Dockerfile'
+    tags: 'latest'
+
+- task: SSH@0
+  inputs:
+    sshEndpoint: 'Kestone_connection'
+    runOptions: 'commands'
+    commands: 'cd /home/shivi/wordpress && docker-compose pull && docker-compose down && docker-compose up -d'
+    interactiveSession: true
+    readyTimeout: '20000'
