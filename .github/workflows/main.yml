@@ -19,7 +19,7 @@ jobs:
         DOCKER_CLI_AK_ENV: 1  # This is used to enable Docker credential helper
 
     - name: Build Docker image
-      run: docker build -t your-docker-username/wordpress-app:latest .
+      run: docker build -t your-docker-username/shivi-wp:latest .
       working-directory: .
 
     - name: Push Docker image to Docker Hub
